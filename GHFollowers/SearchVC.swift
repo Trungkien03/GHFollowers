@@ -46,17 +46,18 @@ class SearchVC: UIViewController {
     }
 
     @objc func pushFollowerListVC() {
-        guard isUserNameEntered else { return }
+        guard isUserNameEntered else {
+            presentGFAlertOnMainThread(
+                title: "Empty Username",
+                message: "Please enter a username to search for",
+                buttonTitle: "Ok"
+            )
+            return
+        }
         let followerListVC = FollowerListVC()
         followerListVC.userName = usernameTextField.text ?? ""
         followerListVC.title = usernameTextField.text ?? "Followers"
         navigationController?.pushViewController(followerListVC, animated: true)
-    }
-
-    @objc func textDidChange() {
-        let hasText = !(usernameTextField.text ?? "").isEmpty
-        callToActionButton.isEnabled = hasText
-        callToActionButton.alpha = hasText ? 1 : 0.5
     }
 
     func configureLogoImageView() {
@@ -78,12 +79,6 @@ class SearchVC: UIViewController {
     func configureTextField() {
         view.addSubview(usernameTextField)
         usernameTextField.delegate = self
-
-        usernameTextField.addTarget(
-            self,
-            action: #selector(textDidChange),
-            for: .editingChanged
-        )
 
         NSLayoutConstraint.activate([
             usernameTextField.topAnchor.constraint(
@@ -111,8 +106,6 @@ class SearchVC: UIViewController {
                 action: #selector(pushFollowerListVC),
                 for: .touchDown
             )
-
-        callToActionButton.isEnabled = isUserNameEntered
 
         NSLayoutConstraint.activate([
             callToActionButton.bottomAnchor.constraint(
