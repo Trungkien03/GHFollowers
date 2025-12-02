@@ -6,9 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
-struct Follower: Decodable {
-    var login: String?
-    var id: Int?
-    var avatarUrl: String?
+struct Follower: Codable, Hashable {
+    let login: String
+    let avatarUrl: String
 }

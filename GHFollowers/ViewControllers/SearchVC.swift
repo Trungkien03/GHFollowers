@@ -22,6 +22,7 @@ class SearchVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        /// order of these calling functions are crucial
         configureLogoImageView()
         configureTextField()
         configureCallToActionButton()
@@ -60,10 +61,12 @@ class SearchVC: UIViewController {
         navigationController?.pushViewController(followerListVC, animated: true)
     }
 
+    /// configuring LOGO github
     func configureLogoImageView() {
         view.addSubview(logoImageView)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        logoImageView.image = UIImage(named: "gh-logo")
+        logoImageView.image = UIImage(resource: .ghLogo)
+        /// the name of image in Assets
 
         NSLayoutConstraint.activate([
             logoImageView.topAnchor.constraint(
@@ -76,9 +79,11 @@ class SearchVC: UIViewController {
         ])
     }
 
+    /// configuring Search Text Field
     func configureTextField() {
         view.addSubview(usernameTextField)
         usernameTextField.delegate = self
+        /// delegate use to modify behavior on the textField (end editing, start editing, etc...)
 
         NSLayoutConstraint.activate([
             usernameTextField.topAnchor.constraint(
@@ -97,6 +102,7 @@ class SearchVC: UIViewController {
         ])
     }
 
+    /// configuring search button
     func configureCallToActionButton() {
         view.addSubview(callToActionButton)
 
@@ -126,6 +132,7 @@ class SearchVC: UIViewController {
 
 }
 
+/// after user pressed return or ok or whatever the submit key of the keyboard, navigate to followerList view
 extension SearchVC: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         pushFollowerListVC()

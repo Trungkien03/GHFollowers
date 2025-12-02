@@ -17,9 +17,12 @@ class FollowerListVC: UIViewController {
 
     private let spinner = UIActivityIndicatorView(style: .large)
 
+    var collectionView: UICollectionView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        configureCollectionView()
         configureSpinner()
         startInitialFetch()
     }
@@ -28,6 +31,41 @@ class FollowerListVC: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
+    }
+
+    func configureCollectionView() {
+        collectionView = UICollectionView(
+            frame: view.bounds,
+            collectionViewLayout: createThreeColumnFlowLayout()
+        )
+        view.addSubview(collectionView)
+        collectionView.backgroundColor = .systemBlue
+        collectionView
+            .register(
+                FollowerCell.self,
+                forCellWithReuseIdentifier: FollowerCell
+                    .reuseIdentifier
+            )
+    }
+
+    // configure layout by 3 columns
+    func createThreeColumnFlowLayout() -> UICollectionViewFlowLayout {
+        let width = view.bounds.width  // width of the device
+        let padding: CGFloat = 12  // padding right side and left side of the collection view
+        let minimumItemSpacing: CGFloat = 8  // spacing between items
+        let availableWidth = width - 2 * padding - minimumItemSpacing  // width of the collection viewq
+        let itemWidth = availableWidth / 3  // three column so we need to devide by 3
+
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(
+            top: padding,
+            left: padding,
+            bottom: padding,
+            right: padding
+        )
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+
+        return layout
     }
 
     private func configureSpinner() {
@@ -62,8 +100,6 @@ class FollowerListVC: UIViewController {
         }
     }
 
-    // MARK: - Networking (async/await)
-    @MainActor
     private func fetchFollowersAsync(page requestedPage: Int) async {
         guard let username = userName, !username.isEmpty else {
             presentGFAlertOnMainThread(
