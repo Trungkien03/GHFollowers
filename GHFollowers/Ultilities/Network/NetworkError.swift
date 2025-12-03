@@ -23,18 +23,25 @@ extension NetworkError: LocalizedError {
         switch self {
         case .invalidURL:
             return "The request URL is invalid."
+
         case .transport(let err):
             return "Network error: \(err.localizedDescription)"
+
         case .server(let statusCode):
             return "Server responded with an error: \(statusCode)."
+
         case .noData:
             return "No data received from the server."
+
         case .decoding:
             return "Failed to decode the server response."
+
         case .cancelled:
             return "The request was cancelled."
+
         case .invalidResponse:
             return "Invalid response from the server."
+
         case .invalidData:
             return "The data received from the server is invalid."
         }

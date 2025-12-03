@@ -109,6 +109,7 @@ final class NetworkService: NetworkServiceProtocol {
             throw NetworkError.decoding(error)
         }
     }
+
 }
 
 // MARK: - Network Manager
@@ -117,7 +118,6 @@ final class NetworkService: NetworkServiceProtocol {
 
 final class NetworkManager {
     static let shared = NetworkManager()
-
     var baseURL: URL = URL(string: "https://api.github.com")!
     private let service: NetworkServiceProtocol
 
@@ -150,6 +150,42 @@ final class NetworkManager {
             } catch {
                 completion(.failure(.transport(error)))
             }
+        }
+    }
+
+    func downloadImage(from urlString: String) async throws -> UIImage {
+
+        // if the image is in the cache then get it out
+        if let image = ImageCacheManager.shared.getImage(forKey: urlString) {
+            return image
+        }
+
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.invalidURL
+        }
+
+        do {
+            let (data, response) = try await service.session.data(from: url)
+
+            guard let http = response as? HTTPURLResponse,
+                (200...299).contains(http.statusCode)
+            else {
+                throw NetworkError.server(
+                    statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1
+                )
+            }
+
+            guard let image = UIImage(data: data) else {
+                throw NetworkError.noData
+            }
+
+            /// store the image cache
+            ImageCacheManager.shared.save(image: image, forKey: urlString)
+            return image
+        } catch is CancellationError {
+            throw NetworkError.cancelled
+        } catch {
+            throw NetworkError.transport(error)
         }
     }
 

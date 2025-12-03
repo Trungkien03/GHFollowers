@@ -8,17 +8,22 @@
 import UIKit
 
 extension UIImageView {
-    func downloadImage(from urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        let task = URLSession.shared.dataTask(with: url) {
-            [weak self] data, _, _ in
-            guard let self = self, let data = data,
-                let image = UIImage(data: data)
-            else { return }
-            DispatchQueue.main.async {
-                self.image = image
+
+    /// download image from link and set it to UIImageView
+    func setImage(from urlString: String) {
+        Task { [weak self] in
+            guard let self = self else { return }
+
+            do {
+                let image = try await NetworkManager.shared.downloadImage(
+                    from: urlString
+                )
+                await MainActor.run {
+                    self.image = image
+                }
+            } catch {
+                print("Failed to load image: \(error)")
             }
         }
-        task.resume()
     }
 }
