@@ -8,7 +8,8 @@
 import Foundation
 import UIKit
 
-struct Follower: Codable, Hashable {
+struct Follower: Identifiable, Codable, Hashable {
     let login: String
+    let id: Int
     let avatarUrl: String
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class FollowerListVC: UIViewController {
+@MainActor class FollowerListVC: UIViewController {
     var userName: String!  // set before presenting this VC
     private var followers: [Follower] = []
     private var page = 1
@@ -19,11 +19,18 @@ class FollowerListVC: UIViewController {
 
     var collectionView: UICollectionView!
 
+    private enum FollowerListSection: Int {
+        case main
+    }
+    private var followerDataSource:
+        UICollectionViewDiffableDataSource<FollowerListSection, Follower.ID>!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         configureCollectionView()
         configureSpinner()
+        configureDataSource()
         startInitialFetch()
     }
 
@@ -39,7 +46,7 @@ class FollowerListVC: UIViewController {
             collectionViewLayout: createThreeColumnFlowLayout()
         )
         view.addSubview(collectionView)
-        collectionView.backgroundColor = .systemBlue
+        collectionView.backgroundColor = .systemBackground
         collectionView
             .register(
                 FollowerCell.self,
@@ -50,10 +57,10 @@ class FollowerListVC: UIViewController {
 
     // configure layout by 3 columns
     func createThreeColumnFlowLayout() -> UICollectionViewFlowLayout {
-        let width = view.bounds.width  // width of the device
-        let padding: CGFloat = 12  // padding right side and left side of the collection view
-        let minimumItemSpacing: CGFloat = 8  // spacing between items
-        let availableWidth = width - 2 * padding - minimumItemSpacing  // width of the collection viewq
+        let width = view.bounds.width
+        let padding: CGFloat = 12
+        let minimumItemSpacing: CGFloat = 10
+        let availableWidth = width - (2 * padding) - (minimumItemSpacing * 2)  // width of the collection viewq
         let itemWidth = availableWidth / 3  // three column so we need to devide by 3
 
         let layout = UICollectionViewFlowLayout()
@@ -63,9 +70,39 @@ class FollowerListVC: UIViewController {
             bottom: padding,
             right: padding
         )
-        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + 36)
 
         return layout
+    }
+
+    func configureDataSource() {
+        followerDataSource = UICollectionViewDiffableDataSource<
+            FollowerListSection, Follower.ID
+        >(
+            collectionView: collectionView,
+            cellProvider: {
+                [weak self] collectionView, indexPath, itemIdentifier in
+                guard
+                    let self = self,
+                    let cell = collectionView.dequeueReusableCell(
+                        withReuseIdentifier: FollowerCell.reuseIdentifier,
+                        for: indexPath
+                    ) as? FollowerCell
+                else {
+                    return UICollectionViewCell()
+                }
+
+                let follower = self.followers[indexPath.item]
+                cell.setFollower(follower: follower)
+                return cell
+            }
+        )
+
+        var snapshot = NSDiffableDataSourceSnapshot<
+            FollowerListSection, Follower.ID
+        >()
+        snapshot.appendSections([.main])
+        followerDataSource.apply(snapshot, animatingDifferences: false)
     }
 
     private func configureSpinner() {
@@ -128,8 +165,18 @@ class FollowerListVC: UIViewController {
                 hasMoreFollowers = false
             }
 
-            // TODO: update your collection/table view here, e.g. collectionView.reloadData()
-            print("Fetched followers: total = \(followers.count)")
+            // Apply snapshot to update collection view
+            var snapshot = NSDiffableDataSourceSnapshot<
+                FollowerListSection, Follower.ID
+            >()
+            snapshot.appendSections([.main])
+            snapshot.appendItems(followers.map { $0.id })
+            DispatchQueue.main.async {
+                self.followerDataSource.apply(
+                    snapshot,
+                    animatingDifferences: true
+                )
+            }
 
         } catch {
             // show friendly error using localizedDescription
