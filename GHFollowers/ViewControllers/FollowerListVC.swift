@@ -43,7 +43,7 @@ import UIKit
     func configureCollectionView() {
         collectionView = UICollectionView(
             frame: view.bounds,
-            collectionViewLayout: createThreeColumnFlowLayout()
+            collectionViewLayout: UIHelper.createThreeColumnFlowLayout(in: view)
         )
         view.addSubview(collectionView)
         collectionView.backgroundColor = .systemBackground
@@ -53,26 +53,6 @@ import UIKit
                 forCellWithReuseIdentifier: FollowerCell
                     .reuseIdentifier
             )
-    }
-
-    // configure layout by 3 columns
-    func createThreeColumnFlowLayout() -> UICollectionViewFlowLayout {
-        let width = view.bounds.width
-        let padding: CGFloat = 12
-        let minimumItemSpacing: CGFloat = 10
-        let availableWidth = width - (2 * padding) - (minimumItemSpacing * 2)  // width of the collection viewq
-        let itemWidth = availableWidth / 3  // three column so we need to devide by 3
-
-        let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(
-            top: padding,
-            left: padding,
-            bottom: padding,
-            right: padding
-        )
-        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + 36)
-
-        return layout
     }
 
     func configureDataSource() {

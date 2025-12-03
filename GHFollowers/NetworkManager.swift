@@ -8,82 +8,12 @@
 import Foundation
 import UIKit
 
-// MARK: - Network Error (User-Friendly Errors)
-enum NetworkError: Error {
-    case invalidURL
-    case transport(Error)  // low-level connection error (no internet, timeout...)
-    case server(statusCode: Int)  // Non-200 status code received
-    case noData  // Response received but empty
-    case invalidResponse
-    case invalidData
-    case decoding(Error)  // JSON decoding failed
-    case cancelled  // Task was cancelled
-}
-extension NetworkError: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "The request URL is invalid."
-        case .transport(let err):
-            return "Network error: \(err.localizedDescription)"
-        case .server(let statusCode):
-            return "Server responded with an error: \(statusCode)."
-        case .noData:
-            return "No data received from the server."
-        case .decoding:
-            return "Failed to decode the server response."
-        case .cancelled:
-            return "The request was cancelled."
-        case .invalidResponse:
-            return "Invalid response from the server."
-        case .invalidData:
-            return "The data received from the server is invalid."
-        }
-    }
-}
-
 // MARK: - HTTP Method
 enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
     case delete = "DELETE"
-}
-
-// MARK: - Endpoint Protocol
-/// Endpoint describes a single HTTP request configuration
-/// This allow to avoid hardcoding URLs inside NetworkManager
-protocol Endpoint {
-    var path: String { get }
-    var method: HTTPMethod { get }
-    var queryItems: [URLQueryItem]? { get }
-    var headers: [String: String]? { get }
-    var body: Data? { get }
-}
-extension Endpoint {
-    func makeRequest(baseURL: URL, timeout: TimeInterval = 30) throws
-        -> URLRequest
-    {
-        var components = URLComponents(
-            url: baseURL.appendingPathComponent(path),
-            resolvingAgainstBaseURL: false
-        )
-        components?.queryItems = queryItems
-
-        guard let finalURL = components?.url else {
-            throw NetworkError.invalidURL
-        }
-
-        var request = URLRequest(url: finalURL, timeoutInterval: timeout)
-        request.httpMethod = method.rawValue
-        request.httpBody = body
-
-        headers?.forEach { key, value in
-            request.setValue(value, forHTTPHeaderField: key)
-        }
-
-        return request
-    }
 }
 
 // MARK: - Network Service Protocol
@@ -195,7 +125,6 @@ final class NetworkManager {
         self.service = service
     }
 
-    // MARK: - Async/await method (recommended)
     /// Fetch GitHub followers using async/await.
     func getFollowers(for username: String, page: Int) async throws
         -> [Follower]
@@ -206,7 +135,6 @@ final class NetworkManager {
             .fetch(endpoint, baseURL, decodeTo: [Follower].self)
     }
 
-    // MARK: - Completion handler (legacy support)
     /// Old-style callback version, internally powered by async/await.
     func getFollowers(
         for username: String,
@@ -224,6 +152,7 @@ final class NetworkManager {
             }
         }
     }
+
 }
 
 // MARK: - Example Endpoint (GitHub Followers)
