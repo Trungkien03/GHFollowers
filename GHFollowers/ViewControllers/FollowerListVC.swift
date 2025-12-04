@@ -10,6 +10,7 @@ import UIKit
 @MainActor class FollowerListVC: UIViewController {
     var userName: String!  // set before presenting this VC
     private var followers: [Follower] = []
+    private var filteredFollowers: [Follower] = []
     private var page = 1
     private var isLoading = false
     private var hasMoreFollowers = true  // simple pagination flag
@@ -26,9 +27,11 @@ import UIKit
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        navigationItem.hidesSearchBarWhenScrolling = false
         configureCollectionView()
         configureDataSource()
         startInitialFetch()
+        configureSearchController()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -137,27 +140,7 @@ import UIKit
                 hasMoreFollowers = false
             }
 
-            // Apply snapshot to update collection view
-            var snapshot = NSDiffableDataSourceSnapshot<
-                FollowerListSection, Follower.ID
-            >()
-            snapshot.appendSections([.main])
-            snapshot.appendItems(followers.map { $0.id })
-
-            await MainActor.run {
-                // Update DataSource và UI
-                self.followerDataSource.apply(
-                    snapshot,
-                    animatingDifferences: true
-                )
-
-                // check và show Empty State
-                if self.followers.isEmpty {
-                    let message =
-                        "This user doesn't have any followers. Go follow them"
-                    self.showEmptyStateView(with: message, in: self.view)
-                }
-            }
+            updateTableData(on: followers)
 
         } catch {
             // show friendly error using localizedDescription
@@ -173,6 +156,40 @@ import UIKit
         }
 
         isLoading = false
+    }
+
+    private func updateTableData(on followers: [Follower]) {
+        // Apply snapshot to update collection view
+        var snapshot = NSDiffableDataSourceSnapshot<
+            FollowerListSection, Follower.ID
+        >()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(followers.map { $0.id })
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            // Update DataSource và UI
+            self.followerDataSource.apply(
+                snapshot,
+                animatingDifferences: true
+            )
+
+            // check và show Empty State
+            if self.followers.isEmpty {
+                let message =
+                    "This user doesn't have any followers. Go follow them"
+                self.showEmptyStateView(with: message, in: self.view)
+            }
+        }
+
+    }
+
+    func configureSearchController() {
+        let searchController = UISearchController()
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = "Search Followers"
+        navigationItem.searchController = searchController
     }
 
     deinit {
@@ -194,5 +211,26 @@ extension FollowerListVC: UICollectionViewDelegate {
         if offSetY > contentHeight - height {
             loadNextPageIfNeeded()
         }
+    }
+}
+
+extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let filter = searchController.searchBar.text, !filter.isEmpty
+        else {
+            filteredFollowers = followers
+            updateTableData(on: followers)
+            return
+        }
+
+        filteredFollowers =
+            followers
+            .filter { $0.login.lowercased().contains(filter.lowercased()) }
+
+        updateTableData(on: filteredFollowers)
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        updateTableData(on: followers)
     }
 }
