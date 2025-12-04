@@ -7,6 +7,8 @@
 
 import UIKit
 
+private var loadingView: LoadingView?
+
 extension UIViewController {
     func presentGFAlertOnMainThread(
         title: String,
@@ -24,5 +26,43 @@ extension UIViewController {
             alertVC.modalTransitionStyle = .crossDissolve
             self?.present(alertVC, animated: true)
         }
+    }
+
+    func showLoadingView() {
+        DispatchQueue.main.async {
+            guard loadingView == nil else { return }
+
+            let lv = LoadingView(frame: self.view.bounds)
+            loadingView = lv
+            lv.alpha = 0
+
+            self.view.addSubview(lv)
+
+            UIView.animate(withDuration: 0.25) {
+                lv.alpha = 1
+            }
+        }
+    }
+
+    func dismissLoadingView() {
+        DispatchQueue.main.async {
+            guard let lv = loadingView else { return }
+
+            UIView.animate(
+                withDuration: 0.25,
+                animations: {
+                    lv.alpha = 0
+                }
+            ) { _ in
+                lv.removeFromSuperview()
+                loadingView = nil
+            }
+        }
+    }
+
+    func showEmptyStateView(with message: String, in view: UIView) {
+        let emptyStateView = GFEmptyView(message: message)
+        view.addSubview(emptyStateView)
+        emptyStateView.frame = view.bounds
     }
 }

@@ -15,8 +15,6 @@ import UIKit
     private var hasMoreFollowers = true  // simple pagination flag
     private var fetchTask: Task<Void, Never>?  // keep reference to cancel if needed
 
-    private let spinner = UIActivityIndicatorView(style: .large)
-
     var collectionView: UICollectionView!
 
     private enum FollowerListSection: Int {
@@ -29,7 +27,6 @@ import UIKit
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         configureCollectionView()
-        configureSpinner()
         configureDataSource()
         startInitialFetch()
     }
@@ -87,16 +84,6 @@ import UIKit
         followerDataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func configureSpinner() {
-        spinner.hidesWhenStopped = true
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(spinner)
-        NSLayoutConstraint.activate([
-            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        ])
-    }
-
     private func startInitialFetch() {
         // cancel any previous fetch (defensive)
         fetchTask?.cancel()
@@ -130,7 +117,10 @@ import UIKit
         }
 
         isLoading = true
-        spinner.startAnimating()
+
+        if requestedPage == 1 {
+            showLoadingView()
+        }
 
         do {
             // network call — uses your NetworkManager.getFollowers(for:page:) async method
@@ -153,11 +143,20 @@ import UIKit
             >()
             snapshot.appendSections([.main])
             snapshot.appendItems(followers.map { $0.id })
-            DispatchQueue.main.async {
+
+            await MainActor.run {
+                // Update DataSource và UI
                 self.followerDataSource.apply(
                     snapshot,
                     animatingDifferences: true
                 )
+
+                // check và show Empty State
+                if self.followers.isEmpty {
+                    let message =
+                        "This user doesn't have any followers. Go follow them"
+                    self.showEmptyStateView(with: message, in: self.view)
+                }
             }
 
         } catch {
@@ -169,7 +168,10 @@ import UIKit
             )
         }
 
-        spinner.stopAnimating()
+        if requestedPage == 1 {
+            dismissLoadingView()
+        }
+
         isLoading = false
     }
 
