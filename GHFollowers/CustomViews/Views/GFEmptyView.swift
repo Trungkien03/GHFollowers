@@ -5,6 +5,7 @@
 //  Created by Kain Nguyen on 4/12/25.
 //
 
+import SnapKit
 import UIKit
 
 class GFEmptyView: UIView {
@@ -37,25 +38,20 @@ class GFEmptyView: UIView {
         logoImageView.image = UIImage(resource: .emptyStateLogo)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            messageLabel.centerYAnchor
-                .constraint(equalTo: self.centerYAnchor, constant: -150),
-            messageLabel.leadingAnchor
-                .constraint(equalTo: self.leadingAnchor, constant: 40),
-            messageLabel.trailingAnchor
-                .constraint(equalTo: self.trailingAnchor, constant: -20),
-            messageLabel.heightAnchor.constraint(equalToConstant: 200),
+        messageLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview().offset(-150)
+            make.leading.equalToSuperview().offset(40)
+            make.trailing.equalToSuperview().offset(-20)
+            make.height.equalTo(200)
+        }
 
-            logoImageView.widthAnchor
-                .constraint(equalTo: self.widthAnchor, multiplier: 1.3),
-            logoImageView.heightAnchor
-                .constraint(equalTo: self.widthAnchor, multiplier: 1.3),
-            logoImageView.trailingAnchor
-                .constraint(equalTo: self.trailingAnchor, constant: 200),
-            logoImageView.bottomAnchor
-                .constraint(equalTo: self.bottomAnchor, constant: 140),
+        logoImageView.snp.makeConstraints { make in
+            make.width.equalToSuperview().multipliedBy(1.3)
+            make.height.equalToSuperview().multipliedBy(0.7)
+            make.trailing.equalToSuperview().offset(200)
+            make.bottom.equalToSuperview().offset(140)
+        }
 
-        ])
     }
 
 }

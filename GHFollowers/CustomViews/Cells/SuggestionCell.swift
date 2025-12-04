@@ -5,6 +5,7 @@
 //  Created by Kain Nguyen on 4/12/25.
 //
 
+import SnapKit
 import UIKit
 
 class SuggestionCell: UITableViewCell {
@@ -35,29 +36,17 @@ class SuggestionCell: UITableViewCell {
         contentView.addSubview(avatarImageView)
         contentView.addSubview(usernameLabel)
 
-        NSLayoutConstraint.activate([
-            avatarImageView.leadingAnchor.constraint(
-                equalTo: contentView.leadingAnchor,
-                constant: 8
-            ),
-            avatarImageView.centerYAnchor.constraint(
-                equalTo: contentView.centerYAnchor
-            ),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 44),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 44),
+        avatarImageView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(8)
+            make.centerY.equalToSuperview()
+            make.height.width.equalTo(44)
+        }
 
-            usernameLabel.leadingAnchor.constraint(
-                equalTo: avatarImageView.trailingAnchor,
-                constant: 12
-            ),
-            usernameLabel.centerYAnchor.constraint(
-                equalTo: contentView.centerYAnchor
-            ),
-            usernameLabel.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor,
-                constant: -8
-            ),
-        ])
+        usernameLabel.snp.makeConstraints { make in
+            make.leading.equalTo(avatarImageView.snp.trailing).offset(12)
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().inset(8)
+        }
     }
 
     func set(username: String, avatarUrl: String?) {

@@ -5,6 +5,7 @@
 //  Created by Kain Nguyen on 4/12/25.
 //
 
+import SnapKit
 import UIKit
 
 final class LoadingView: UIView {
@@ -26,10 +27,9 @@ final class LoadingView: UIView {
         spinner.translatesAutoresizingMaskIntoConstraints = false
         addSubview(spinner)
 
-        NSLayoutConstraint.activate([
-            spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
+        spinner.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
 
         spinner.startAnimating()
     }

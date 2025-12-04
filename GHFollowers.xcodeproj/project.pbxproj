@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5A22D6212EE180240076A693 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5A22D6202EE180240076A693 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E47AB01E2EDAC6B300EB995B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A22D6212EE180240076A693 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = GHFollowers;
 			packageProductDependencies = (
+				5A22D6202EE180240076A693 /* SnapKit */,
 			);
 			productName = GHFollowers;
 			productReference = E47AB0072EDAC6B100EB995B /* GHFollowers.app */;
@@ -208,6 +214,9 @@
 			);
 			mainGroup = E47AAFFE2EDAC6B100EB995B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5A22D61F2EE17F9B0076A693 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E47AB0082EDAC6B100EB995B /* Products */;
 			projectDirPath = "";
@@ -599,6 +608,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5A22D61F2EE17F9B0076A693 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5A22D6202EE180240076A693 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A22D61F2EE17F9B0076A693 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E47AAFFF2EDAC6B100EB995B /* Project object */;
 }

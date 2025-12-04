@@ -5,6 +5,7 @@
 //  Created by Kain Nguyen on 2/12/25.
 //
 
+import SnapKit
 import UIKit
 
 class FollowerCell: UICollectionViewCell {
@@ -32,44 +33,19 @@ class FollowerCell: UICollectionViewCell {
 
         let padding: CGFloat = 8
 
-        NSLayoutConstraint.activate(
-            [
-                avatarImageView.topAnchor
-                    .constraint(
-                        equalTo: contentView.topAnchor,
-                        constant: padding
-                    ),
-                avatarImageView.leadingAnchor
-                    .constraint(
-                        equalTo: contentView.leadingAnchor,
-                        constant: padding
-                    ),
-                avatarImageView.trailingAnchor
-                    .constraint(
-                        equalTo: contentView.trailingAnchor,
-                        constant: -padding
-                    ),
-                avatarImageView.heightAnchor
-                    .constraint(equalTo: avatarImageView.widthAnchor),
+        avatarImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(padding)
+            make.leading.equalToSuperview().offset(padding)
+            make.trailing.equalToSuperview().inset(padding)
+            make.height.equalTo(avatarImageView.snp.width)
+        }
 
-                userNameLabel.topAnchor
-                    .constraint(
-                        equalTo: avatarImageView.bottomAnchor,
-                        constant: 12
-                    ),
-                userNameLabel.leadingAnchor
-                    .constraint(
-                        equalTo: contentView.leadingAnchor,
-                        constant: padding
-                    ),
-                userNameLabel.trailingAnchor
-                    .constraint(
-                        equalTo: contentView.trailingAnchor,
-                        constant: -padding
-                    ),
-                userNameLabel.heightAnchor.constraint(equalToConstant: 20),
+        userNameLabel.snp.makeConstraints { make in
+            make.top.equalTo(avatarImageView.snp.bottom).offset(16)
+            make.leading.equalToSuperview().offset(padding)
+            make.trailing.equalToSuperview().inset(padding)
+            make.height.equalTo(20)
+        }
 
-            ]
-        )
     }
 }
