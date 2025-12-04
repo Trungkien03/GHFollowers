@@ -53,6 +53,8 @@ import UIKit
                 forCellWithReuseIdentifier: FollowerCell
                     .reuseIdentifier
             )
+
+        collectionView.delegate = self
     }
 
     func configureDataSource() {
@@ -174,5 +176,21 @@ import UIKit
     deinit {
         // cancel any running task when the VC is deallocated
         fetchTask?.cancel()
+    }
+}
+
+extension FollowerListVC: UICollectionViewDelegate {
+
+    func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
+        let offSetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+
+        if offSetY > contentHeight - height {
+            loadNextPageIfNeeded()
+        }
     }
 }

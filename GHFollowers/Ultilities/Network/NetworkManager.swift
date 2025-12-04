@@ -135,6 +135,18 @@ final class NetworkManager {
             .fetch(endpoint, baseURL, decodeTo: [Follower].self)
     }
 
+    /// fetch github users
+    func searchUsers(for userName: String, page: Int) async throws
+        -> GithubUserSearchResponse
+    {
+        let endpoint = GithubUsersEndpoint(username: userName, page: page)
+        return try await service.fetch(
+            endpoint,
+            baseURL,
+            decodeTo: GithubUserSearchResponse.self
+        )
+    }
+
     /// Old-style callback version, internally powered by async/await.
     func getFollowers(
         for username: String,
@@ -153,9 +165,8 @@ final class NetworkManager {
         }
     }
 
+    /// if the image is in the cache then get it out
     func downloadImage(from urlString: String) async throws -> UIImage {
-
-        // if the image is in the cache then get it out
         if let image = ImageCacheManager.shared.getImage(forKey: urlString) {
             return image
         }
@@ -189,29 +200,6 @@ final class NetworkManager {
         }
     }
 
-}
-
-// MARK: - Example Endpoint (GitHub Followers)
-/// A strongly-typed endpoint for GitHub Followers API.
-struct GitHubFollowersEndpoint: Endpoint {
-    let username: String
-    let page: Int
-
-    var path: String { "/users/\(username)/followers" }
-    var method: HTTPMethod { .get }
-
-    var queryItems: [URLQueryItem]? {
-        [
-            URLQueryItem(name: "page", value: "\(page)"),
-            URLQueryItem(name: "per_page", value: "100"),
-        ]
-    }
-
-    var headers: [String: String]? {
-        ["Accept": "application/vnd.github.v3+json"]
-    }
-
-    var body: Data? { nil }
 }
 
 //
