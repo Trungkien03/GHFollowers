@@ -20,12 +20,32 @@ class UserInfoVC: UIViewController {
             action: #selector(dismissVC)
         )
         navigationItem.rightBarButtonItem = doneButton
-
-        print(userName)
+        Task {
+            await fetchUserInfo()
+        }
     }
 
     @objc func dismissVC() {
         dismiss(animated: true)
+    }
+
+    private func fetchUserInfo() async {
+        guard let login = userName else { return }
+
+        do {
+            let user = try await NetworkManager.shared.getUserInfo(
+                in: login
+            )
+
+            print(user)
+
+        } catch {
+            presentGFAlertOnMainThread(
+                title: "Error",
+                message: error.localizedDescription,
+                buttonTitle: "Ok"
+            )
+        }
     }
 
 }

@@ -147,6 +147,12 @@ final class NetworkManager {
         )
     }
 
+    /// get userInfo
+    func getUserInfo(in userName: String) async throws -> User {
+        let endpoint = GetUserInfo(username: userName)
+        return try await service.fetch(endpoint, baseURL, decodeTo: User.self)
+    }
+
     /// Old-style callback version, internally powered by async/await.
     func getFollowers(
         for username: String,

@@ -103,3 +103,23 @@ struct GithubUsersEndpoint: Endpoint {
 
     var body: Data? { nil }
 }
+
+// MARK: -  Endpoint (fetch github user)
+struct GetUserInfo: Endpoint {
+    let username: String
+
+    var path: String {
+        return "/users/\(username)"  // Endpoint tìm kiếm người dùng (Không kèm query)
+    }
+    var method: HTTPMethod { .get }
+    // 2. store query items
+    var queryItems: [URLQueryItem]? {
+        return []
+    }
+
+    var headers: [String: String]? {
+        ["Accept": "application/vnd.github+json"]
+    }
+
+    var body: Data? { nil }
+}
