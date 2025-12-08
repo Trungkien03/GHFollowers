@@ -5,6 +5,7 @@
 //  Created by Kain Nguyen on 1/12/25.
 //
 
+import SafariServices
 import UIKit
 
 private var loadingView: LoadingView?
@@ -64,5 +65,10 @@ extension UIViewController {
         let emptyStateView = GFEmptyView(message: message)
         view.addSubview(emptyStateView)
         emptyStateView.frame = view.bounds
+    }
+
+    func presentSafariVC(with url: URL) {
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
     }
 }

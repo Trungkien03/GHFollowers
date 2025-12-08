@@ -26,6 +26,15 @@ class GFFollowerItemVC: GFItemInfoVC {
     }
 
     override func actionButtonTapped() {
-        delegate?.didTapFollowerProfile()
+        guard let userName = user?.login else {
+            presentGFAlertOnMainThread(
+                title: "Error",
+                message: "cannot find username of this user",
+                buttonTitle: "Ok"
+            )
+
+            return
+        }
+        delegate?.didTapFollowerProfile(with: userName)
     }
 }

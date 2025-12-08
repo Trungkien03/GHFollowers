@@ -5,13 +5,12 @@
 //  Created by Kain Nguyen on 8/12/25.
 //
 
-import SafariServices
 import SnapKit
 import UIKit
 
-protocol UserInfoVCDelegate {
+protocol UserInfoVCDelegate: AnyObject {
     func didTapGithubProfile(with url: URL)
-    func didTapFollowerProfile()
+    func didTapFollowerProfile(with username: String)
 }
 
 class UserInfoVC: UIViewController {
@@ -23,6 +22,7 @@ class UserInfoVC: UIViewController {
     let dateLabel = GFBodyLabel(textAlignment: .center)
 
     var userName: String?
+    weak var delegate: FollowerListVCDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,13 +141,11 @@ class UserInfoVC: UIViewController {
 
 extension UserInfoVC: UserInfoVCDelegate {
     func didTapGithubProfile(with url: URL) {
-        let safariVC = SFSafariViewController(url: url)
-        present(safariVC, animated: true)
+        presentSafariVC(with: url)
     }
 
-    func didTapFollowerProfile() {
-        /// dismissVC
-        /// tell follower list screen the new user
+    func didTapFollowerProfile(with login: String) {
+        delegate?.didRequestFollower(for: login)
+        dismissVC()
     }
-
 }
