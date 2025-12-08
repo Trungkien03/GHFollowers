@@ -154,7 +154,7 @@ protocol FollowerListVCDelegate: AnyObject {
                 forCellWithReuseIdentifier: FollowerCell
                     .reuseIdentifier
             )
-
+        collectionView.alwaysBounceVertical = true
         collectionView.delegate = self
     }
 
@@ -209,7 +209,49 @@ protocol FollowerListVCDelegate: AnyObject {
     }
 
     @objc func addButtonTapped() {
-        print("Add button tapped")
+        showLoadingView()
+        Task {
+            do {
+                let user = try await NetworkManager.shared.getUserInfo(
+                    in: userName
+                )
+                dismissLoadingView()
+                let favorite = Follower(
+                    login: user.login,
+                    id: user.id,
+                    avatarUrl: user.avatarUrl
+                )
+
+                PersistenceManager
+                    .updateWith(
+                        favorite: favorite,
+                        actionType: .add
+                    ) { [weak self] error in
+                        guard let self = self else { return }
+
+                        guard let error = error else {
+                            self.presentGFAlertOnMainThread(
+                                title: "Success",
+                                message:
+                                    "You have successfully favorited this user !",
+                                buttonTitle: "OK"
+                            )
+                            return
+                        }
+                        presentGFAlertOnMainThread(
+                            title: "Something went wrong!",
+                            message: error.localizedDescription,
+                            buttonTitle: "OK"
+                        )
+                    }
+            } catch {
+                presentGFAlertOnMainThread(
+                    title: "Something went wrong!",
+                    message: error.localizedDescription,
+                    buttonTitle: "OK"
+                )
+            }
+        }
     }
 
     deinit {

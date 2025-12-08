@@ -71,4 +71,40 @@ extension UIViewController {
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
     }
+
+    func presentConfirmationAlert(
+        title: String,
+        message: String,
+        confirmTitle: String = "OK",
+        cancelTitle: String = "Cancel",
+        confirmStyle: UIAlertAction.Style = .destructive,
+        onConfirm: @escaping () -> Void
+    ) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: title,
+                message: message,
+                preferredStyle: .alert
+            )
+
+            let cancelAction = UIAlertAction(
+                title: cancelTitle,
+                style: .cancel,
+                handler: nil
+            )
+
+            let confirmAction = UIAlertAction(
+                title: confirmTitle,
+                style: confirmStyle
+            ) { _ in
+                onConfirm()
+            }
+
+            alert.addAction(cancelAction)
+            alert.addAction(confirmAction)
+
+            self.present(alert, animated: true)
+        }
+    }
+
 }

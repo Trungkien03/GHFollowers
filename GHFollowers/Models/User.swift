@@ -8,6 +8,7 @@
 import Foundation
 
 struct User: Codable {
+    let id: Int
     let login: String
     let avatarUrl: String
     var name: String?
@@ -22,6 +23,7 @@ struct User: Codable {
 
     static var placeholder: User {
         let exampleUser = User(
+            id: 12,
             login: "applefanboy",
             avatarUrl: "https://avatars.githubusercontent.com/u/1000000?v=4",
             name: "Steve Wozniak",
