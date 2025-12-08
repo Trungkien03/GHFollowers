@@ -132,7 +132,11 @@ final class NetworkManager {
         let endpoint = GitHubFollowersEndpoint(username: username, page: page)
         return
             try await service
-            .fetch(endpoint, baseURL, decodeTo: [Follower].self)
+            .fetch(
+                endpoint,
+                baseURL,
+                decodeTo: [Follower].self
+            )
     }
 
     /// fetch github users
@@ -147,10 +151,14 @@ final class NetworkManager {
         )
     }
 
-    /// get userInfo
+    /// fetch userInfo
     func getUserInfo(in userName: String) async throws -> User {
         let endpoint = GetUserInfo(username: userName)
-        return try await service.fetch(endpoint, baseURL, decodeTo: User.self)
+        return try await service.fetch(
+            endpoint,
+            baseURL,
+            decodeTo: User.self
+        )
     }
 
     /// Old-style callback version, internally powered by async/await.

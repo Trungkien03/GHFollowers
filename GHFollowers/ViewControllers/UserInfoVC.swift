@@ -5,9 +5,12 @@
 //  Created by Kain Nguyen on 8/12/25.
 //
 
+import SnapKit
 import UIKit
 
 class UserInfoVC: UIViewController {
+
+    let headerView = UIView()
 
     var userName: String?
 
@@ -20,32 +23,56 @@ class UserInfoVC: UIViewController {
             action: #selector(dismissVC)
         )
         navigationItem.rightBarButtonItem = doneButton
-        Task {
-            await fetchUserInfo()
-        }
+        layoutUI()
+        fetchUserInfo()
     }
 
     @objc func dismissVC() {
         dismiss(animated: true)
     }
 
-    private func fetchUserInfo() async {
+    private func fetchUserInfo() {
         guard let login = userName else { return }
 
-        do {
-            let user = try await NetworkManager.shared.getUserInfo(
-                in: login
-            )
+        Task {
+            do {
+                let user = try await NetworkManager.shared.getUserInfo(
+                    in: login
+                )
 
-            print(user)
+                self.add(
+                    childVC: GFUserInfoHeaderVC(user: user),
+                    to: self.headerView
+                )
 
-        } catch {
-            presentGFAlertOnMainThread(
-                title: "Error",
-                message: error.localizedDescription,
-                buttonTitle: "Ok"
-            )
+            } catch {
+                presentGFAlertOnMainThread(
+                    title: "Error",
+                    message: error.localizedDescription,
+                    buttonTitle: "Ok"
+                )
+            }
         }
+    }
+
+    func layoutUI() {
+        view.addSubview(headerView)
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        let padding = 5
+
+        headerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.equalToSuperview().offset(padding)
+            make.trailing.equalToSuperview().inset(padding)
+            make.height.equalTo(200)
+        }
+    }
+
+    private func add(childVC: UIViewController, to containerView: UIView) {
+        addChild(childVC)
+        containerView.addSubview(childVC.view)
+        childVC.view.frame = containerView.bounds
+        childVC.didMove(toParent: self)
     }
 
 }
