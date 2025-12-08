@@ -15,6 +15,7 @@ import UIKit
     private var isLoading = false
     private var hasMoreFollowers = true  // simple pagination flag
     private var fetchTask: Task<Void, Never>?  // keep reference to cancel if needed
+    private var isSearching = false
 
     var collectionView: UICollectionView!
 
@@ -40,7 +41,7 @@ import UIKit
         navigationController?.navigationBar.prefersLargeTitles = true
     }
 
-    func configureCollectionView() {
+    private func configureCollectionView() {
         collectionView = UICollectionView(
             frame: view.bounds,
             collectionViewLayout: UIHelper.createThreeColumnFlowLayout(in: view)
@@ -57,7 +58,7 @@ import UIKit
         collectionView.delegate = self
     }
 
-    func configureDataSource() {
+    private func configureDataSource() {
         followerDataSource = UICollectionViewDiffableDataSource<
             FollowerListSection, Follower.ID
         >(
@@ -184,7 +185,7 @@ import UIKit
 
     }
 
-    func configureSearchController() {
+    private func configureSearchController() {
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
@@ -200,6 +201,7 @@ import UIKit
 
 extension FollowerListVC: UICollectionViewDelegate {
 
+    /// tracking scroll height to load next page - perform infinite scroll
     func scrollViewDidEndDragging(
         _ scrollView: UIScrollView,
         willDecelerate decelerate: Bool
@@ -212,6 +214,22 @@ extension FollowerListVC: UICollectionViewDelegate {
             loadNextPageIfNeeded()
         }
     }
+
+    /// delegate function use when user tap the item in the collection
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        let activeArray = isSearching ? filteredFollowers : followers
+        let follower = activeArray[indexPath.item]
+
+        let userInfoVC = UserInfoVC()
+        userInfoVC.userName = follower.login
+        let navController = UINavigationController(
+            rootViewController: userInfoVC
+        )
+        present(navController, animated: true)
+    }
 }
 
 extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
@@ -223,6 +241,8 @@ extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
             return
         }
 
+        isSearching = true
+
         filteredFollowers =
             followers
             .filter { $0.login.lowercased().contains(filter.lowercased()) }
@@ -231,6 +251,7 @@ extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        isSearching = false
         updateTableData(on: followers)
     }
 }
