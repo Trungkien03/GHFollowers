@@ -62,13 +62,12 @@ class GFUserInfoHeaderVC: UIViewController {
     }
 
     private func layoutUI() {
-        let padding: CGFloat = 20
         let textImagePadding: CGFloat = 12
         locationImageView.translatesAutoresizingMaskIntoConstraints = false
 
         avatarImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(padding)
-            make.leading.equalToSuperview().offset(padding)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
             make.width.height.equalTo(90)
         }
 
@@ -77,7 +76,7 @@ class GFUserInfoHeaderVC: UIViewController {
             make.leading
                 .equalTo(avatarImageView.snp.trailing)
                 .offset(textImagePadding)
-            make.trailing.equalToSuperview().inset(padding)
+            make.trailing.equalToSuperview()
             make.height.equalTo(38)
         }
 
@@ -86,7 +85,7 @@ class GFUserInfoHeaderVC: UIViewController {
             make.leading
                 .equalTo(avatarImageView.snp.trailing)
                 .offset(textImagePadding)
-            make.trailing.equalToSuperview().inset(padding)
+            make.trailing.equalToSuperview()
             make.height.equalTo(24)
         }
 
@@ -101,7 +100,7 @@ class GFUserInfoHeaderVC: UIViewController {
         locationLabel.snp.makeConstraints { make in
             make.centerY.equalTo(locationImageView.snp.centerY)
             make.leading.equalTo(locationImageView.snp.trailing).offset(5)
-            make.trailing.equalToSuperview().inset(padding)
+            make.trailing.equalToSuperview()
         }
 
         bioLabel.snp.makeConstraints { make in
@@ -109,7 +108,7 @@ class GFUserInfoHeaderVC: UIViewController {
                 .equalTo(avatarImageView.snp.bottom)
                 .offset(textImagePadding)
             make.leading.equalTo(avatarImageView.snp.leading)
-            make.trailing.equalToSuperview().inset(padding)
+            make.trailing.equalToSuperview()
             make.height.equalTo(60)
         }
     }

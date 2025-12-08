@@ -19,12 +19,7 @@ enum HTTPMethod: String {
 // MARK: - Network Service Protocol
 protocol NetworkServiceProtocol {
     var session: URLSession { get }
-    func fetch<T: Decodable>(
-        _ endpoint: Endpoint,
-        _ baseURL: URL,
-        decodeTo: T.Type
-    )
-        async throws
+    func fetch<T: Decodable>(_ endpoint: Endpoint, _ baseURL: URL) async throws
         -> T
     func fetchData(_ endpoint: Endpoint, _ baseURL: URL) async throws -> Data
 }
@@ -36,7 +31,7 @@ final class NetworkService: NetworkServiceProtocol {
         self.session = session
     }
 
-    /// fetch data from endPoint using async/await
+    /// this method is used to fetching data from API
     func fetchData(_ endpoint: Endpoint, _ baseURL: URL) async throws -> Data {
         let request = try endpoint.makeRequest(baseURL: baseURL)
 
@@ -59,17 +54,25 @@ final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    // Generic fetch method for any Decodable model (Sendable removed)
-    func fetch<T>(_ endpoint: Endpoint, _ baseURL: URL, decodeTo: T.Type)
-        async throws -> T
-    where T: Decodable {
+    /// this method is used to decode the data after fetching the data
+    func fetch<T: Decodable>(_ endpoint: Endpoint, _ baseURL: URL) async throws
+        -> T
+    {
         let data = try await fetchData(endpoint, baseURL)
+
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             return try decoder.decode(T.self, from: data)
-        } catch let decodingError as DecodingError {
-            // Build a more descriptive error for debugging
+        } catch {
+            logDecodingError(error, data: data)
+            throw NetworkError.decoding(error)
+        }
+    }
+
+    /// helper function is used to log decode error
+    private func logDecodingError(_ error: Error, data: Data) {
+        if let decodingError = error as? DecodingError {
             switch decodingError {
             case .typeMismatch(let type, let context):
                 print(
@@ -94,19 +97,12 @@ final class NetworkService: NetworkServiceProtocol {
                     "Unknown decoding error: \(decodingError.localizedDescription)"
                 )
             }
-
-            // Optional: also print the raw JSON for inspection
-            if let jsonStr = String(data: data, encoding: .utf8) {
-                print("---- Raw JSON ----\n\(jsonStr)\n---- end ----")
-            }
-
-            throw NetworkError.decoding(decodingError)
-        } catch {
+        } else {
             print("Other decode error: \(error.localizedDescription)")
-            if let jsonStr = String(data: data, encoding: .utf8) {
-                print("Response JSON:\n\(jsonStr)")
-            }
-            throw NetworkError.decoding(error)
+        }
+
+        if let jsonStr = String(data: data, encoding: .utf8) {
+            print("---- Raw JSON ----\n\(jsonStr)\n---- end ----")
         }
     }
 
@@ -130,13 +126,7 @@ final class NetworkManager {
         -> [Follower]
     {
         let endpoint = GitHubFollowersEndpoint(username: username, page: page)
-        return
-            try await service
-            .fetch(
-                endpoint,
-                baseURL,
-                decodeTo: [Follower].self
-            )
+        return try await service.fetch(endpoint, baseURL)
     }
 
     /// fetch github users
@@ -144,21 +134,13 @@ final class NetworkManager {
         -> GithubUserSearchResponse
     {
         let endpoint = GithubUsersEndpoint(username: userName, page: page)
-        return try await service.fetch(
-            endpoint,
-            baseURL,
-            decodeTo: GithubUserSearchResponse.self
-        )
+        return try await service.fetch(endpoint, baseURL)
     }
 
     /// fetch userInfo
     func getUserInfo(in userName: String) async throws -> User {
         let endpoint = GetUserInfo(username: userName)
-        return try await service.fetch(
-            endpoint,
-            baseURL,
-            decodeTo: User.self
-        )
+        return try await service.fetch(endpoint, baseURL)
     }
 
     /// Old-style callback version, internally powered by async/await.

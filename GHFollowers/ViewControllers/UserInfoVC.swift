@@ -11,18 +11,15 @@ import UIKit
 class UserInfoVC: UIViewController {
 
     let headerView = UIView()
+    let itemViewOne = UIView()
+    let itemViewTwo = UIView()
+    var itemViews: [UIView] = []
 
     var userName: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        let doneButton = UIBarButtonItem(
-            barButtonSystemItem: .done,
-            target: self,
-            action: #selector(dismissVC)
-        )
-        navigationItem.rightBarButtonItem = doneButton
+        configureVC()
         layoutUI()
         fetchUserInfo()
     }
@@ -45,6 +42,16 @@ class UserInfoVC: UIViewController {
                     to: self.headerView
                 )
 
+                self.add(
+                    childVC: GFReposItemVC(user: user),
+                    to: self.itemViewOne
+                )
+
+                self.add(
+                    childVC: GFFollowerItemVC(user: user),
+                    to: self.itemViewTwo
+                )
+
             } catch {
                 presentGFAlertOnMainThread(
                     title: "Error",
@@ -55,17 +62,58 @@ class UserInfoVC: UIViewController {
         }
     }
 
-    func layoutUI() {
+    private func configureVC() {
+        view.backgroundColor = .systemBackground
+        let doneButton = UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: self,
+            action: #selector(dismissVC)
+        )
+        navigationItem.rightBarButtonItem = doneButton
+    }
+
+    private func layoutUI() {
+        let padding: CGFloat = 20
+        let itemHeight: CGFloat = 140
+        itemViews = [itemViewOne, itemViewTwo]
+
+        // add header
         view.addSubview(headerView)
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        let padding = 5
 
         headerView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(padding)
             make.leading.equalToSuperview().offset(padding)
             make.trailing.equalToSuperview().inset(padding)
-            make.height.equalTo(200)
+            make.height.equalTo(180)
         }
+
+        // add & layout item views in one loop, chaining to previous
+        var previous: UIView = headerView
+        for itemView in itemViews {
+            view.addSubview(itemView)
+            // common styling
+            itemView.layer.cornerRadius = 10
+            itemView.clipsToBounds = true
+
+            itemView.snp.makeConstraints { make in
+                make.top.equalTo(previous.snp.bottom).offset(padding)
+                make.leading.equalToSuperview().offset(padding)
+                make.trailing.equalToSuperview().inset(padding)
+                make.height.equalTo(itemHeight)
+            }
+
+            previous = itemView
+        }
+
+        // optional: add bottom constraint to last item so content size is explicit
+        if let last = itemViews.last {
+            last.snp.makeConstraints { make in
+                make.bottom.lessThanOrEqualTo(
+                    view.safeAreaLayoutGuide.snp.bottom
+                ).inset(padding)
+            }
+        }
+
     }
 
     private func add(childVC: UIViewController, to containerView: UIView) {
