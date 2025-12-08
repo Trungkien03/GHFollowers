@@ -31,8 +31,7 @@ protocol FollowerListVCDelegate: AnyObject {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        navigationItem.hidesSearchBarWhenScrolling = false
+        configureViewController()
         configureCollectionView()
         configureDataSource()
         startInitialFetch()
@@ -43,53 +42,6 @@ protocol FollowerListVCDelegate: AnyObject {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
-    }
-
-    private func configureCollectionView() {
-        collectionView = UICollectionView(
-            frame: view.bounds,
-            collectionViewLayout: UIHelper.createThreeColumnFlowLayout(in: view)
-        )
-        view.addSubview(collectionView)
-        collectionView.backgroundColor = .systemBackground
-        collectionView
-            .register(
-                FollowerCell.self,
-                forCellWithReuseIdentifier: FollowerCell
-                    .reuseIdentifier
-            )
-
-        collectionView.delegate = self
-    }
-
-    private func configureDataSource() {
-        followerDataSource = UICollectionViewDiffableDataSource<
-            FollowerListSection, Follower.ID
-        >(
-            collectionView: collectionView,
-            cellProvider: {
-                [weak self] collectionView, indexPath, itemIdentifier in
-                guard
-                    let self = self,
-                    let cell = collectionView.dequeueReusableCell(
-                        withReuseIdentifier: FollowerCell.reuseIdentifier,
-                        for: indexPath
-                    ) as? FollowerCell
-                else {
-                    return UICollectionViewCell()
-                }
-
-                let follower = self.followers[indexPath.item]
-                cell.setFollower(follower: follower)
-                return cell
-            }
-        )
-
-        var snapshot = NSDiffableDataSourceSnapshot<
-            FollowerListSection, Follower.ID
-        >()
-        snapshot.appendSections([.main])
-        followerDataSource.apply(snapshot, animatingDifferences: false)
     }
 
     private func startInitialFetch() {
@@ -189,12 +141,75 @@ protocol FollowerListVCDelegate: AnyObject {
 
     }
 
+    private func configureCollectionView() {
+        collectionView = UICollectionView(
+            frame: view.bounds,
+            collectionViewLayout: UIHelper.createThreeColumnFlowLayout(in: view)
+        )
+        view.addSubview(collectionView)
+        collectionView.backgroundColor = .systemBackground
+        collectionView
+            .register(
+                FollowerCell.self,
+                forCellWithReuseIdentifier: FollowerCell
+                    .reuseIdentifier
+            )
+
+        collectionView.delegate = self
+    }
+
+    private func configureDataSource() {
+        followerDataSource = UICollectionViewDiffableDataSource<
+            FollowerListSection, Follower.ID
+        >(
+            collectionView: collectionView,
+            cellProvider: {
+                [weak self] collectionView, indexPath, itemIdentifier in
+                guard
+                    let self = self,
+                    let cell = collectionView.dequeueReusableCell(
+                        withReuseIdentifier: FollowerCell.reuseIdentifier,
+                        for: indexPath
+                    ) as? FollowerCell
+                else {
+                    return UICollectionViewCell()
+                }
+
+                let follower = self.followers[indexPath.item]
+                cell.setFollower(follower: follower)
+                return cell
+            }
+        )
+
+        var snapshot = NSDiffableDataSourceSnapshot<
+            FollowerListSection, Follower.ID
+        >()
+        snapshot.appendSections([.main])
+        followerDataSource.apply(snapshot, animatingDifferences: false)
+    }
+
     private func configureSearchController() {
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = "Search Followers"
         navigationItem.searchController = searchController
+    }
+
+    private func configureViewController() {
+        view.backgroundColor = .systemBackground
+        navigationItem.hidesSearchBarWhenScrolling = false
+
+        let addButton = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(addButtonTapped)
+        )
+        navigationItem.rightBarButtonItem = addButton
+    }
+
+    @objc func addButtonTapped() {
+        print("Add button tapped")
     }
 
     deinit {

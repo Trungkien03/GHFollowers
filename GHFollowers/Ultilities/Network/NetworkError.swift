@@ -47,3 +47,26 @@ extension NetworkError: LocalizedError {
         }
     }
 }
+
+enum PersistenceError: Error, LocalizedError {
+    case encodingFailed(Error)
+    case decodingFailed(Error)
+    case noData
+    case alreadyExists
+    case unableToFavorite(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .encodingFailed:
+            return "Failed to encode the data."
+        case .decodingFailed:
+            return "Failed to decode the data."
+        case .noData:
+            return "No data to decode."
+        case .alreadyExists:
+            return "The item you are trying to save already exists."
+        case .unableToFavorite:
+            return "There was an error favoriting this user. Please try again."
+        }
+    }
+}
