@@ -5,8 +5,14 @@
 //  Created by Kain Nguyen on 8/12/25.
 //
 
+import SafariServices
 import SnapKit
 import UIKit
+
+protocol UserInfoVCDelegate {
+    func didTapGithubProfile(with url: URL)
+    func didTapFollowerProfile()
+}
 
 class UserInfoVC: UIViewController {
 
@@ -37,25 +43,7 @@ class UserInfoVC: UIViewController {
                 let user = try await NetworkManager.shared.getUserInfo(
                     in: login
                 )
-
-                self.add(
-                    childVC: GFUserInfoHeaderVC(user: user),
-                    to: self.headerView
-                )
-
-                self.add(
-                    childVC: GFReposItemVC(user: user),
-                    to: self.itemViewOne
-                )
-
-                self.add(
-                    childVC: GFFollowerItemVC(user: user),
-                    to: self.itemViewTwo
-                )
-
-                self.dateLabel.text =
-                    "Github Since \(user.createdAt.convertToDisplayDateFormat())"
-
+                self.configureUIElements(with: user)
             } catch {
                 presentGFAlertOnMainThread(
                     title: "Error",
@@ -64,6 +52,20 @@ class UserInfoVC: UIViewController {
                 )
             }
         }
+    }
+
+    private func configureUIElements(with user: User) {
+        let infoHeaderItem = GFUserInfoHeaderVC(user: user)
+        let repoItemVC = GFReposItemVC(user: user)
+        repoItemVC.delegate = self
+        let followerItemVC = GFFollowerItemVC(user: user)
+        followerItemVC.delegate = self
+
+        self.add(childVC: infoHeaderItem, to: self.headerView)
+        self.add(childVC: repoItemVC, to: self.itemViewOne)
+        self.add(childVC: followerItemVC, to: self.itemViewTwo)
+        self.dateLabel.text =
+            "Github Since \(user.createdAt.convertToDisplayDateFormat())"
     }
 
     private func configureVC() {
@@ -133,6 +135,19 @@ class UserInfoVC: UIViewController {
         containerView.addSubview(childVC.view)
         childVC.view.frame = containerView.bounds
         childVC.didMove(toParent: self)
+    }
+
+}
+
+extension UserInfoVC: UserInfoVCDelegate {
+    func didTapGithubProfile(with url: URL) {
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
+    }
+
+    func didTapFollowerProfile() {
+        /// dismissVC
+        /// tell follower list screen the new user
     }
 
 }

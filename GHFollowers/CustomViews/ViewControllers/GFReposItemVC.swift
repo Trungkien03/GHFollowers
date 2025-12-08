@@ -22,4 +22,19 @@ class GFReposItemVC: GFItemInfoVC {
             title: "Github Profile"
         )
     }
+
+    override func actionButtonTapped() {
+
+        guard let html = user?.htmlUrl,
+            let urlProfile = URL(string: html)
+        else {
+            presentGFAlertOnMainThread(
+                title: "Invalid URL",
+                message: "The url attached to this user is invalid",
+                buttonTitle: "Ok"
+            )
+            return
+        }
+        delegate?.didTapGithubProfile(with: urlProfile)
+    }
 }
