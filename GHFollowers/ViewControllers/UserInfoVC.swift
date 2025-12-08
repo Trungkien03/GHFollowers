@@ -14,6 +14,7 @@ class UserInfoVC: UIViewController {
     let itemViewOne = UIView()
     let itemViewTwo = UIView()
     var itemViews: [UIView] = []
+    let dateLabel = GFBodyLabel(textAlignment: .center)
 
     var userName: String?
 
@@ -52,6 +53,9 @@ class UserInfoVC: UIViewController {
                     to: self.itemViewTwo
                 )
 
+                self.dateLabel.text =
+                    "Github Since \(user.createdAt.convertToDisplayDateFormat())"
+
             } catch {
                 presentGFAlertOnMainThread(
                     title: "Error",
@@ -75,10 +79,10 @@ class UserInfoVC: UIViewController {
     private func layoutUI() {
         let padding: CGFloat = 20
         let itemHeight: CGFloat = 140
-        itemViews = [itemViewOne, itemViewTwo]
 
         // add header
         view.addSubview(headerView)
+        view.addSubview(dateLabel)
 
         headerView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(padding)
@@ -87,6 +91,7 @@ class UserInfoVC: UIViewController {
             make.height.equalTo(180)
         }
 
+        itemViews = [itemViewOne, itemViewTwo]
         // add & layout item views in one loop, chaining to previous
         var previous: UIView = headerView
         for itemView in itemViews {
@@ -113,6 +118,13 @@ class UserInfoVC: UIViewController {
                 ).inset(padding)
             }
         }
+
+        dateLabel.snp.makeConstraints { make in
+            make.top.equalTo(itemViewTwo.snp.bottom).offset(padding)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(18)
+        }
+        dateLabel.font = UIFont.preferredFont(forTextStyle: .headline)
 
     }
 
