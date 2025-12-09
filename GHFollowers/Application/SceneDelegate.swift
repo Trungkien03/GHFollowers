@@ -11,7 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     private var appCoordinator: AppCoordinator?
-    private let dependencyContainer = DIContainer()
+    private let appDIContainer = AppDIContainer()
 
     func scene(
         _ scene: UIScene,
@@ -26,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Initialize AppCoordinator and start flow
         appCoordinator = AppCoordinator(
             window: window!,
-            dependencyContainer: dependencyContainer
+            appDIContainer: appDIContainer
         )
         appCoordinator?.start()
     }

@@ -21,12 +21,12 @@ final class SearchVC: UIViewController {
 
     // MARK: - Properties
     private let viewModel: SearchViewModel
-    private weak var coordinator: SearchCoordinator?
+    private weak var coordinator: FlowRouting?
     private var cancellables = Set<AnyCancellable>()
     private var heightConstraint: NSLayoutConstraint?
 
     // MARK: - Initialization
-    init(viewModel: SearchViewModel, coordinator: SearchCoordinator) {
+    init(viewModel: SearchViewModel, coordinator: FlowRouting) {
         self.viewModel = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)

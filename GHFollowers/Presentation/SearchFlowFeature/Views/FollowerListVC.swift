@@ -19,7 +19,7 @@ final class FollowerListVC: UIViewController {
 
     // MARK: - Properties
     private let viewModel: FollowerListViewModel
-    private weak var coordinator: FollowerListCoordinator?
+    private weak var coordinator: FlowRouting?
     private var cancellables = Set<AnyCancellable>()
 
     private enum FollowerListSection: Int {
@@ -29,7 +29,7 @@ final class FollowerListVC: UIViewController {
         UICollectionViewDiffableDataSource<FollowerListSection, Follower.ID>!
 
     // MARK: - Initialization
-    init(viewModel: FollowerListViewModel, coordinator: FollowerListCoordinator)
+    init(viewModel: FollowerListViewModel, coordinator: FlowRouting)
     {
         self.viewModel = viewModel
         self.coordinator = coordinator

@@ -15,11 +15,11 @@ final class FavoritesListVC: UIViewController {
 
     // MARK: - Properties
     private let viewModel: FavoritesListViewModel
-    private weak var coordinator: FavoritesCoordinator?
+    private weak var coordinator: FlowRouting?
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
-    init(viewModel: FavoritesListViewModel, coordinator: FavoritesCoordinator) {
+    init(viewModel: FavoritesListViewModel, coordinator: FlowRouting) {
         self.viewModel = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)

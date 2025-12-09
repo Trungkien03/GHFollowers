@@ -14,11 +14,11 @@ final class AppCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
 
     private let window: UIWindow
-    private let dependencyContainer: DIContainer
+    private let appDIContainer: AppDIContainer
 
-    init(window: UIWindow, dependencyContainer: DIContainer) {
+    init(window: UIWindow, appDIContainer: AppDIContainer) {
         self.window = window
-        self.dependencyContainer = dependencyContainer
+        self.appDIContainer = appDIContainer
         self.navigationController = UINavigationController()
     }
 
@@ -26,25 +26,8 @@ final class AppCoordinator: Coordinator {
         let tabBarController = UITabBarController()
         UITabBar.appearance().tintColor = .systemGreen
 
-        // Create Search Coordinator
-        let searchNavController = UINavigationController()
-        let searchCoordinator = SearchCoordinator(
-            navigationController: searchNavController,
-            dependencyContainer: dependencyContainer
-        )
-        searchCoordinator.parentCoordinator = self
-        addChild(searchCoordinator)
-        searchCoordinator.start()
-
-        // Create Favorites Coordinator
-        let favoritesNavController = UINavigationController()
-        let favoritesCoordinator = FavoritesCoordinator(
-            navigationController: favoritesNavController,
-            dependencyContainer: dependencyContainer
-        )
-        favoritesCoordinator.parentCoordinator = self
-        addChild(favoritesCoordinator)
-        favoritesCoordinator.start()
+        let favoritesNavController = configureFavoriteFlow()
+        let searchNavController = configureSearchFlow()
 
         // Setup TabBar
         tabBarController.viewControllers = [
@@ -56,6 +39,51 @@ final class AppCoordinator: Coordinator {
         window.makeKeyAndVisible()
 
         configureNavigationBar()
+    }
+
+    private func configureSearchFlow() -> UINavigationController {
+        // Create Search Flow Feature DIContainer
+        let searchFlowDIContainer = SearchFlowFeatureDIContainer(
+            dependencies: .init(
+                networkService: appDIContainer.networkService,
+                baseURL: appDIContainer.baseURL,
+                persistenceManager: appDIContainer.persistenceManager
+            )
+        )
+
+        // Create Search Flow Coordinator
+        let searchNavController = UINavigationController()
+        let searchFlowCoordinator = SearchFlowCoordinator(
+            navigationController: searchNavController,
+            dependencies: searchFlowDIContainer
+        )
+        searchFlowCoordinator.parentCoordinator = self
+        addChild(searchFlowCoordinator)
+        searchFlowCoordinator.start()
+
+        return searchNavController
+    }
+
+    private func configureFavoriteFlow() -> UINavigationController {
+        // Create Favorites Flow Feature DIContainer
+        let favoritesFlowDIContainer = FavoritesFlowFeatureDIContainer(
+            dependencies: .init(
+                networkService: appDIContainer.networkService,
+                baseURL: appDIContainer.baseURL,
+                persistenceManager: appDIContainer.persistenceManager
+            )
+        )
+        // Create Favorites Flow Coordinator
+        let favoritesNavController = UINavigationController()
+        let favoritesFlowCoordinator = FavoritesFlowCoordinator(
+            navigationController: favoritesNavController,
+            dependencies: favoritesFlowDIContainer
+        )
+        favoritesFlowCoordinator.parentCoordinator = self
+        addChild(favoritesFlowCoordinator)
+        favoritesFlowCoordinator.start()
+
+        return favoritesNavController
     }
 
     private func configureNavigationBar() {

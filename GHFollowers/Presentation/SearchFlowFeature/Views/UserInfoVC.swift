@@ -26,14 +26,14 @@ final class UserInfoVC: UIViewController {
 
     // MARK: - Properties
     private let viewModel: UserInfoViewModel
-    private weak var coordinator: UserInfoCoordinator?
+    private weak var coordinator: FlowRouting?
     private weak var followerListDelegate: FollowerListVCDelegate?
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
     init(
         viewModel: UserInfoViewModel,
-        coordinator: UserInfoCoordinator,
+        coordinator: FlowRouting,
         followerListDelegate: FollowerListVCDelegate?
     ) {
         self.viewModel = viewModel
@@ -172,7 +172,7 @@ final class UserInfoVC: UIViewController {
 
     // MARK: - Actions
     @objc private func dismissVC() {
-        coordinator?.dismiss()
+        coordinator?.dismissUserInfo()
     }
 }
 
@@ -183,6 +183,6 @@ extension UserInfoVC: UserInfoVCDelegate {
     }
 
     func didTapFollowerProfile(with login: String) {
-        coordinator?.showFollowerList(for: login)
+        coordinator?.showFollowerListFromUserInfo(for: login)
     }
 }
