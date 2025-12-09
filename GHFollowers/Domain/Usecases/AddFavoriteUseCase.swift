@@ -7,16 +7,15 @@
 
 import Foundation
 
-/// Use Case để thêm một favorite
+/// Use Case to add new favorite
 final class AddFavoriteUseCase {
     private let repository: FavoriteRepositoryProtocol
-    
+
     init(repository: FavoriteRepositoryProtocol) {
         self.repository = repository
     }
-    
+
     func execute(follower: Follower) async throws {
         try await repository.addFavorite(follower)
     }
 }
-

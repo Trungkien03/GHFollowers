@@ -7,16 +7,15 @@
 
 import Foundation
 
-/// Use Case để lấy thông tin chi tiết của một user
+/// Use Case to get detail info of a user
 final class GetUserInfoUseCase {
     private let repository: UserRepositoryProtocol
-    
+
     init(repository: UserRepositoryProtocol) {
         self.repository = repository
     }
-    
+
     func execute(username: String) async throws -> User {
         return try await repository.getUserInfo(for: username)
     }
 }
-

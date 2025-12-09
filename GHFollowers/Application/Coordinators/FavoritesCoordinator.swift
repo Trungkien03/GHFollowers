@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Coordinator quản lý Favorites flow
+/// Coordinator manage Favorites flow
 final class FavoritesCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
@@ -40,7 +40,7 @@ final class FavoritesCoordinator: Coordinator {
         navigationController.pushViewController(viewController, animated: false)
     }
 
-    /// Navigate đến FollowerList screen
+    /// Navigate to FollowerList screen
     func showFollowerList(for username: String) {
         let followerListCoordinator = FollowerListCoordinator(
             navigationController: navigationController,

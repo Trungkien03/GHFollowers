@@ -7,16 +7,17 @@
 
 import Foundation
 
-/// Use Case để tìm kiếm users
+/// Use Case to find new users
 final class SearchUsersUseCase {
     private let repository: FollowerRepositoryProtocol
-    
+
     init(repository: FollowerRepositoryProtocol) {
         self.repository = repository
     }
-    
-    func execute(query: String, page: Int) async throws -> GithubUserSearchResponse {
+
+    func execute(query: String, page: Int) async throws
+        -> GithubUserSearchResponse
+    {
         return try await repository.searchUsers(for: query, page: page)
     }
 }
-

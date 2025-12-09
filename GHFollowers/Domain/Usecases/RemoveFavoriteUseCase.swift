@@ -7,16 +7,15 @@
 
 import Foundation
 
-/// Use Case để xóa một favorite
+/// Use Case to remove favorite
 final class RemoveFavoriteUseCase {
     private let repository: FavoriteRepositoryProtocol
-    
+
     init(repository: FavoriteRepositoryProtocol) {
         self.repository = repository
     }
-    
+
     func execute(follower: Follower) async throws {
         try await repository.removeFavorite(follower)
     }
 }
-

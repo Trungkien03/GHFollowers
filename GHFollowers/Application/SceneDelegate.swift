@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
 
-        // Khởi tạo AppCoordinator và bắt đầu flow
+        // Initialize AppCoordinator and start flow
         appCoordinator = AppCoordinator(
             window: window!,
             dependencyContainer: dependencyContainer

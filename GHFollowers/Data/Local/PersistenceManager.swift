@@ -11,7 +11,7 @@ enum PersistenceActionType {
     case add, remove
 }
 
-/// Protocol để abstract PersistenceManager, giúp dễ test và inject
+/// Protocol to abstract PersistenceManager, help easy to test and inject
 protocol PersistenceManagerProtocol {
     func updateWith(
         favorite: Follower,
@@ -26,11 +26,11 @@ protocol PersistenceManagerProtocol {
 /// Implementation của PersistenceManager
 final class PersistenceManager: PersistenceManagerProtocol {
     private let defaults: UserDefaults
-    
+
     enum Keys {
         static let favorites = "favorites"
     }
-    
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }

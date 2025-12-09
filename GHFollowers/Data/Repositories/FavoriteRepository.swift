@@ -7,14 +7,14 @@
 
 import Foundation
 
-/// Implementation của FavoriteRepositoryProtocol
+/// Implementation of FavoriteRepositoryProtocol
 final class FavoriteRepository: FavoriteRepositoryProtocol {
     private let persistenceManager: PersistenceManagerProtocol
-    
+
     init(persistenceManager: PersistenceManagerProtocol) {
         self.persistenceManager = persistenceManager
     }
-    
+
     func getFavorites() async throws -> [Follower] {
         return try await withCheckedThrowingContinuation { continuation in
             persistenceManager.retrieveFavorites { result in
@@ -27,7 +27,7 @@ final class FavoriteRepository: FavoriteRepositoryProtocol {
             }
         }
     }
-    
+
     func addFavorite(_ follower: Follower) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             persistenceManager.updateWith(
@@ -42,7 +42,7 @@ final class FavoriteRepository: FavoriteRepositoryProtocol {
             }
         }
     }
-    
+
     func removeFavorite(_ follower: Follower) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             persistenceManager.updateWith(
@@ -58,4 +58,3 @@ final class FavoriteRepository: FavoriteRepositoryProtocol {
         }
     }
 }
-

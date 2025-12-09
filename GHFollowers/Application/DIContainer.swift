@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Dependency Injection Container - quản lý tất cả dependencies của app
+/// Dependency Injection Container - manage all dependencies of the app
 final class DIContainer {
 
     // MARK: - Network Layer

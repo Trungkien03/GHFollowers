@@ -5,10 +5,10 @@
 //  Created by Auto on 9/12/25.
 //
 
-import Foundation
 import Combine
+import Foundation
 
-/// ViewModel cho FavoritesListVC - quản lý logic hiển thị danh sách favorites
+/// ViewModel cho FavoritesListVC - manage logic to show favorite list
 @MainActor
 final class FavoritesListViewModel {
     // MARK: - Published Properties
@@ -16,11 +16,11 @@ final class FavoritesListViewModel {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var isEmpty: Bool = false
-    
+
     // MARK: - Dependencies
     private let getFavoritesUseCase: GetFavoritesUseCase
     private let removeFavoriteUseCase: RemoveFavoriteUseCase
-    
+
     // MARK: - Initialization
     init(
         getFavoritesUseCase: GetFavoritesUseCase,
@@ -29,14 +29,14 @@ final class FavoritesListViewModel {
         self.getFavoritesUseCase = getFavoritesUseCase
         self.removeFavoriteUseCase = removeFavoriteUseCase
     }
-    
+
     // MARK: - Public Methods
-    /// Load danh sách favorites
+    /// Load favorite list
     func loadFavorites() {
         Task {
             isLoading = true
             errorMessage = nil
-            
+
             do {
                 favorites = try await getFavoritesUseCase.execute()
                 isEmpty = favorites.isEmpty
@@ -45,16 +45,16 @@ final class FavoritesListViewModel {
                 favorites = []
                 isEmpty = true
             }
-            
+
             isLoading = false
         }
     }
-    
-    /// Xóa một favorite
+
+    /// remove one favorite
     func removeFavorite(_ follower: Follower) async throws {
         isLoading = true
         errorMessage = nil
-        
+
         do {
             try await removeFavoriteUseCase.execute(follower: follower)
             favorites.removeAll { $0.login == follower.login }
@@ -63,8 +63,7 @@ final class FavoritesListViewModel {
             errorMessage = error.localizedDescription
             throw error
         }
-        
+
         isLoading = false
     }
 }
-

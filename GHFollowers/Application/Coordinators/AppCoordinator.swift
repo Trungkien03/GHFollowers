@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Main Coordinator manage TabBar và các flow chính
+/// Main Coordinator manage TabBar and main flows
 final class AppCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
@@ -26,7 +26,7 @@ final class AppCoordinator: Coordinator {
         let tabBarController = UITabBarController()
         UITabBar.appearance().tintColor = .systemGreen
 
-        // Tạo Search Coordinator
+        // Create Search Coordinator
         let searchNavController = UINavigationController()
         let searchCoordinator = SearchCoordinator(
             navigationController: searchNavController,
@@ -36,7 +36,7 @@ final class AppCoordinator: Coordinator {
         addChild(searchCoordinator)
         searchCoordinator.start()
 
-        // Tạo Favorites Coordinator
+        // Create Favorites Coordinator
         let favoritesNavController = UINavigationController()
         let favoritesCoordinator = FavoritesCoordinator(
             navigationController: favoritesNavController,

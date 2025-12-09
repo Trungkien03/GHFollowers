@@ -5,8 +5,8 @@
 //  Created by Kain Nguyen on 1/12/25.
 //
 
-import UIKit
 import Combine
+import UIKit
 
 protocol FollowerListVCDelegate: AnyObject {
     func didRequestFollower(for username: String)
@@ -16,28 +16,30 @@ protocol FollowerListVCDelegate: AnyObject {
 final class FollowerListVC: UIViewController {
     // MARK: - UI Components
     var collectionView: UICollectionView!
-    
+
     // MARK: - Properties
     private let viewModel: FollowerListViewModel
     private weak var coordinator: FollowerListCoordinator?
     private var cancellables = Set<AnyCancellable>()
-    
+
     private enum FollowerListSection: Int {
         case main
     }
-    private var followerDataSource: UICollectionViewDiffableDataSource<FollowerListSection, Follower.ID>!
-    
+    private var followerDataSource:
+        UICollectionViewDiffableDataSource<FollowerListSection, Follower.ID>!
+
     // MARK: - Initialization
-    init(viewModel: FollowerListViewModel, coordinator: FollowerListCoordinator) {
+    init(viewModel: FollowerListViewModel, coordinator: FollowerListCoordinator)
+    {
         self.viewModel = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,25 +50,25 @@ final class FollowerListVC: UIViewController {
         bindViewModel()
         viewModel.loadFollowers()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
     }
-    
+
     // MARK: - Public Methods
     /// Update username và reload (được gọi từ coordinator)
     func updateUsername(_ username: String) {
         viewModel.updateUsername(username)
         title = username
     }
-    
+
     // MARK: - Setup
     private func configureViewController() {
         view.backgroundColor = .systemBackground
         navigationItem.hidesSearchBarWhenScrolling = false
-        
+
         let addButton = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
@@ -74,7 +76,7 @@ final class FollowerListVC: UIViewController {
         )
         navigationItem.rightBarButtonItem = addButton
     }
-    
+
     private func configureCollectionView() {
         collectionView = UICollectionView(
             frame: view.bounds,
@@ -89,35 +91,41 @@ final class FollowerListVC: UIViewController {
         collectionView.alwaysBounceVertical = true
         collectionView.delegate = self
     }
-    
+
     private func configureDataSource() {
-        followerDataSource = UICollectionViewDiffableDataSource<FollowerListSection, Follower.ID>(
+        followerDataSource = UICollectionViewDiffableDataSource<
+            FollowerListSection, Follower.ID
+        >(
             collectionView: collectionView,
-            cellProvider: { [weak self] collectionView, indexPath, itemIdentifier in
+            cellProvider: {
+                [weak self] collectionView, indexPath, itemIdentifier in
                 guard let self = self,
-                      let cell = collectionView.dequeueReusableCell(
-                          withReuseIdentifier: FollowerCell.reuseIdentifier,
-                          for: indexPath
-                      ) as? FollowerCell else {
+                    let cell = collectionView.dequeueReusableCell(
+                        withReuseIdentifier: FollowerCell.reuseIdentifier,
+                        for: indexPath
+                    ) as? FollowerCell
+                else {
                     return UICollectionViewCell()
                 }
-                
+
                 let activeFollowers = self.viewModel.getActiveFollowers()
                 guard indexPath.item < activeFollowers.count else {
                     return UICollectionViewCell()
                 }
-                
+
                 let follower = activeFollowers[indexPath.item]
                 cell.setFollower(follower: follower)
                 return cell
             }
         )
-        
-        var snapshot = NSDiffableDataSourceSnapshot<FollowerListSection, Follower.ID>()
+
+        var snapshot = NSDiffableDataSourceSnapshot<
+            FollowerListSection, Follower.ID
+        >()
         snapshot.appendSections([.main])
         followerDataSource.apply(snapshot, animatingDifferences: false)
     }
-    
+
     private func configureSearchController() {
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
@@ -125,7 +133,7 @@ final class FollowerListVC: UIViewController {
         searchController.searchBar.placeholder = "Search Followers"
         navigationItem.searchController = searchController
     }
-    
+
     private func bindViewModel() {
         // Bind followers list
         viewModel.$followers
@@ -135,7 +143,7 @@ final class FollowerListVC: UIViewController {
                 self?.updateCollectionView()
             }
             .store(in: &cancellables)
-        
+
         // Bind loading state
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
@@ -147,7 +155,7 @@ final class FollowerListVC: UIViewController {
                 }
             }
             .store(in: &cancellables)
-        
+
         // Bind error messages
         viewModel.$errorMessage
             .compactMap { $0 }
@@ -160,27 +168,33 @@ final class FollowerListVC: UIViewController {
                 )
             }
             .store(in: &cancellables)
-        
+
         // Bind empty state
         viewModel.$isEmpty
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isEmpty in
                 if isEmpty {
-                    let message = "This user doesn't have any followers. Go follow them"
-                    self?.showEmptyStateView(with: message, in: self?.view ?? UIView())
+                    let message =
+                        "This user doesn't have any followers. Go follow them"
+                    self?.showEmptyStateView(
+                        with: message,
+                        in: self?.view ?? UIView()
+                    )
                 }
             }
             .store(in: &cancellables)
     }
-    
+
     private func updateCollectionView() {
         let activeFollowers = viewModel.getActiveFollowers()
-        var snapshot = NSDiffableDataSourceSnapshot<FollowerListSection, Follower.ID>()
+        var snapshot = NSDiffableDataSourceSnapshot<
+            FollowerListSection, Follower.ID
+        >()
         snapshot.appendSections([.main])
         snapshot.appendItems(activeFollowers.map { $0.id })
         followerDataSource.apply(snapshot, animatingDifferences: true)
     }
-    
+
     // MARK: - Actions
     @objc private func addButtonTapped() {
         Task {
@@ -211,19 +225,19 @@ extension FollowerListVC: UICollectionViewDelegate {
         let offSetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
-        
+
         if offSetY > contentHeight - height {
             viewModel.loadMoreFollowers()
         }
     }
-    
+
     func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
         let activeFollowers = viewModel.getActiveFollowers()
         guard indexPath.item < activeFollowers.count else { return }
-        
+
         let follower = activeFollowers[indexPath.item]
         coordinator?.showUserInfo(for: follower.login, delegate: self)
     }
@@ -238,7 +252,7 @@ extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
         }
         viewModel.filterFollowers(searchText: filter)
     }
-    
+
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         viewModel.clearSearch()
     }
