@@ -10,6 +10,8 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    private var appCoordinator: AppCoordinator?
+    private let dependencyContainer = DIContainer()
 
     func scene(
         _ scene: UIScene,
@@ -20,46 +22,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = createTabBar()
-        window?.makeKeyAndVisible()
 
-        configureNavigationBar()
-    }
-
-    func createSearchNavigationController() -> UINavigationController {
-        let searchVC = SearchVC()
-        searchVC.title = "Search"
-        searchVC.tabBarItem = UITabBarItem(
-            tabBarSystemItem: .search,
-            tag: 0
+        // Khởi tạo AppCoordinator và bắt đầu flow
+        appCoordinator = AppCoordinator(
+            window: window!,
+            dependencyContainer: dependencyContainer
         )
-        return UINavigationController(rootViewController: searchVC)
-    }
-
-    func createFavoritesListNavigationController() -> UINavigationController {
-        let favoritesListVC = FavoritesListVC()
-        favoritesListVC.title = "Favorites"
-        favoritesListVC.tabBarItem = UITabBarItem(
-            tabBarSystemItem: .favorites,
-            tag: 1
-        )
-
-        return UINavigationController(rootViewController: favoritesListVC)
-    }
-
-    func createTabBar() -> UITabBarController {
-        let tabBar = UITabBarController()
-        UITabBar.appearance().tintColor = .systemGreen
-        tabBar.viewControllers = [
-            createSearchNavigationController(),
-            createFavoritesListNavigationController(),
-        ]
-
-        return tabBar
-    }
-
-    func configureNavigationBar() {
-        UINavigationBar.appearance().tintColor = .systemGreen
+        appCoordinator?.start()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

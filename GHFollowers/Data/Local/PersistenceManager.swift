@@ -11,14 +11,31 @@ enum PersistenceActionType {
     case add, remove
 }
 
-enum PersistenceManager {
-    static private let defaults = UserDefaults.standard
+/// Protocol để abstract PersistenceManager, giúp dễ test và inject
+protocol PersistenceManagerProtocol {
+    func updateWith(
+        favorite: Follower,
+        actionType: PersistenceActionType,
+        completion: @escaping (Error?) -> Void
+    )
+    func retrieveFavorites(
+        completion: @escaping (Result<[Follower], Error>) -> Void
+    )
+}
 
+/// Implementation của PersistenceManager
+final class PersistenceManager: PersistenceManagerProtocol {
+    private let defaults: UserDefaults
+    
     enum Keys {
         static let favorites = "favorites"
     }
+    
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
 
-    static func updateWith(
+    func updateWith(
         favorite: Follower,
         actionType: PersistenceActionType,
         completion: @escaping (Error?) -> Void
@@ -35,13 +52,11 @@ enum PersistenceManager {
                         return
                     }
                     retrievedFavorites.append(favorite)
-                    break
                 case .remove:
                     retrievedFavorites.removeAll { $0.login == favorite.login }
-                    break
                 }
 
-                completion(save(favorites: retrievedFavorites))
+                completion(self.save(favorites: retrievedFavorites))
 
             case .failure(let error):
                 completion(error)
@@ -50,7 +65,7 @@ enum PersistenceManager {
     }
 
     /// retreive favorites
-    static func retrieveFavorites(
+    func retrieveFavorites(
         completion: @escaping (Result<[Follower], Error>) -> Void
     ) {
         guard
@@ -77,7 +92,7 @@ enum PersistenceManager {
     }
 
     /// save favorites
-    static func save(favorites: [Follower]) -> Error? {
+    private func save(favorites: [Follower]) -> Error? {
         do {
             let encoder = JSONEncoder()
             let favouritesData = try encoder.encode(favorites)
