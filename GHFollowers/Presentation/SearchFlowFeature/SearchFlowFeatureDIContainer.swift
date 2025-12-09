@@ -7,22 +7,8 @@
 
 import Foundation
 
-/// Protocol defining dependencies for SearchFlowCoordinator
-protocol SearchFlowCoordinatorDependencies {
-    func makeSearchViewController(coordinator: FlowRouting) -> SearchVC
-    func makeFollowerListViewController(
-        username: String,
-        coordinator: FlowRouting
-    ) -> FollowerListVC
-    func makeUserInfoViewController(
-        username: String,
-        coordinator: FlowRouting,
-        delegate: FollowerListVCDelegate?
-    ) -> UserInfoVC
-}
-
 /// Feature DIContainer for Search/FollowerList/UserInfo module
-final class SearchFlowFeatureDIContainer: SearchFlowCoordinatorDependencies {
+final class SearchFlowFeatureDIContainer {
 
     struct Dependencies {
         let networkService: NetworkServiceProtocol

@@ -7,25 +7,8 @@
 
 import Foundation
 
-/// Protocol defining dependencies for FavoritesFlowCoordinator
-protocol FavoritesFlowCoordinatorDependencies {
-    func makeFavoritesListViewController(coordinator: FlowRouting)
-        -> FavoritesListVC
-    func makeFollowerListViewController(
-        username: String,
-        coordinator: FlowRouting
-    ) -> FollowerListVC
-    func makeUserInfoViewController(
-        username: String,
-        coordinator: FlowRouting,
-        delegate: FollowerListVCDelegate?
-    ) -> UserInfoVC
-}
-
 /// Feature DIContainer for Favorites module
-final class FavoritesFlowFeatureDIContainer:
-    FavoritesFlowCoordinatorDependencies
-{
+final class FavoritesFlowFeatureDIContainer {
 
     struct Dependencies {
         let networkService: NetworkServiceProtocol

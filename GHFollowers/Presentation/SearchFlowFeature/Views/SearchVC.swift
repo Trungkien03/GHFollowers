@@ -174,14 +174,13 @@ final class SearchVC: UIViewController {
             forCellReuseIdentifier: SuggestionCell.reuseID
         )
 
-        // Setup constraints - chỉ dùng SnapKit cho top, leading, trailing
+        // Setup constraints
         suggestionTableView.snp.makeConstraints { make in
             make.top.equalTo(usernameTextField.snp.bottom)
             make.leading.equalTo(usernameTextField.snp.leading)
             make.trailing.equalTo(usernameTextField.snp.trailing)
         }
 
-        // Tạo height constraint riêng để có thể update sau
         heightConstraint = suggestionTableView.heightAnchor.constraint(
             equalToConstant: 0
         )

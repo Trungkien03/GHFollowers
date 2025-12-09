@@ -14,11 +14,11 @@ final class FavoritesFlowCoordinator: Coordinator, FlowRouting {
     var childCoordinators: [Coordinator] = []
     var parentCoordinator: Coordinator?
 
-    private let dependencies: FavoritesFlowCoordinatorDependencies
+    private let dependencies: FavoritesFlowFeatureDIContainer
 
     init(
         navigationController: UINavigationController,
-        dependencies: FavoritesFlowCoordinatorDependencies
+        dependencies: FavoritesFlowFeatureDIContainer
     ) {
         self.navigationController = navigationController
         self.dependencies = dependencies
